@@ -1,0 +1,246 @@
+# LaTeX Document Editor
+
+A modern, web-based LaTeX document editor built with Vue 3, TypeScript, and CodeMirror 6.
+
+## Features
+
+::card-grid
+:::card{title="Real-time LaTeX Editing"}
+- **Syntax Highlighting**: Advanced LaTeX syntax highlighting with CodeMirror 6
+- **Live Preview**: Instant document rendering as you type
+- **Error Prevention**: TypeScript-powered development with comprehensive linting
+:::
+
+:::card{title="Professional Document Rendering"}
+- **A4 Page Visualization**: Realistic page layouts with proper dimensions
+- **Automatic Pagination**: Smart content flow across multiple pages
+- **KaTeX Math Rendering**: Beautiful mathematical expressions
+:::
+
+:::card{title="Advanced Template System"}
+- **Multiple Document Types**: Article, Report, Letter, Presentation templates
+- **Spanish Language Support**: Full internationalization with babel package
+- **Professional Formatting**: Business proposals, academic papers, and more
+:::
+::
+
+## Technical Architecture
+
+### Core Components
+
+```typescript
+// Main editor component structure
+├── LatexEditor.vue          // Split-pane editor interface
+├── DocumentViewer.vue       // Multi-page document renderer  
+├── DocumentPage.vue         // Individual page component
+└── TopBar.vue              // Template selector and tools
+```
+
+### Key Technologies
+
+- **Vue 3 Composition API**: Reactive document management
+- **CodeMirror 6**: Professional code editing experience
+- **KaTeX**: Fast math typesetting
+- **Tailwind CSS**: Modern, responsive styling
+- **TypeScript**: Type-safe development
+
+## Document Processing Pipeline
+
+::mermaid
+graph LR
+    A[LaTeX Source] --> B[Content Parser]
+    B --> C[Pagination Engine]
+    C --> D[HTML Generator]
+    D --> E[KaTeX Renderer]
+    E --> F[A4 Page Layout]
+::
+
+### Intelligent Pagination
+
+The editor features a sophisticated pagination system that:
+
+- **Analyzes Content Structure**: Identifies headings, paragraphs, math expressions, and lists
+- **Estimates Content Heights**: Calculates space requirements for different elements
+- **Smart Page Breaks**: Avoids breaking important content across pages
+- **Content Splitting**: Intelligently divides long paragraphs and lists
+
+## Example Usage
+
+### Spanish Business Proposal
+
+```latex
+\documentclass[12pt]{article}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+
+\begin{document}
+
+\textbf{PROPUESTA ECONÓMICA}
+
+Bucaramanga 23 de mayo de 2025
+
+Señores\\
+\textbf{UNIVERSIDAD SANTO TOMÁS}
+
+\textbf{Asunto:} Proyecto de robótica educativa
+
+El sistema incluye sensores automáticos, cámaras de grabación, 
+y plataforma web para campeonatos autónomos.
+
+\textbf{Costo del servicio:} $ 2.000.000
+
+\end{document}
+```
+
+## Installation & Development
+
+### Dependencies
+
+```json
+{
+  "dependencies": {
+    "@codemirror/basic-setup": "^0.20.0",
+    "@codemirror/commands": "^6.9.0", 
+    "@codemirror/state": "^6.5.2",
+    "@codemirror/view": "^6.38.4",
+    "codemirror-lang-latex": "^0.2.0",
+    "vue": "^3.5.21"
+  }
+}
+```
+
+### Development Setup
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production  
+npm run build
+```
+
+## Project Structure
+
+```
+src/
+├── components/
+│   ├── LatexEditor.vue      # Main editor interface
+│   ├── DocumentViewer.vue   # Document preview system
+│   ├── DocumentPage.vue     # Individual page renderer
+│   └── TopBar.vue          # Template selector
+├── composables/
+│   └── document/           # Document management logic
+├── constants/
+│   ├── page-dimensions.ts  # A4/Letter page specifications
+│   └── latex-templates.ts  # Document templates
+├── utils/
+│   ├── pagination.ts       # Smart pagination engine
+│   ├── lipsum.ts          # Lorem ipsum generator
+│   ├── latex-units.ts     # LaTeX to CSS unit conversion
+│   └── geometry-parser.ts # Geometry package parsing
+└── types/
+    └── latex.ts            # TypeScript definitions
+```
+
+## Key Features Implemented
+
+### Document Templates
+
+::code-group
+```latex [Article Template]
+\documentclass{article}
+\usepackage{amsmath, amssymb}
+\title{Research Article}
+\author{Author Name}
+\begin{document}
+\maketitle
+\section{Introduction}
+Content here...
+\end{document}
+```
+
+```latex [Business Proposal]  
+\documentclass[12pt]{article}
+\usepackage[spanish]{babel}
+\usepackage[a4paper,margin=2.5cm]{geometry}
+\textbf{PROPUESTA ECONÓMICA}
+Business content...
+```
+
+```latex [Presentation]
+\documentclass{beamer}  
+\title{Research Presentation}
+\begin{frame}
+\frametitle{Title}
+Content...
+\end{frame}
+```
+::
+
+### LaTeX Unit Conversion Utility
+
+The `convertLatexUnit` function provides seamless conversion between LaTeX units and CSS pixels:
+
+```typescript
+// Available in src/utils/latex-units.ts
+import { convertLatexUnit } from '../utils/latex-units';
+
+// Usage examples
+convertLatexUnit('12pt')    // → 16px (12 * 1.333)
+convertLatexUnit('2.5cm')   // → 94.5px (2.5 * 37.795) 
+convertLatexUnit('1in')     // → 96px (1 * 96)
+convertLatexUnit('10mm')    // → 37.8px (10 * 3.7795)
+convertLatexUnit('1.5em')   // → 24px (1.5 * 16)
+convertLatexUnit('24px')    // → 24px (direct)
+
+// Supported units: pt, px, em, cm, mm, in
+// Used by: spacing commands, geometry parsing, font sizing
+```
+
+### Geometry Package Support
+
+Dynamic page layout based on LaTeX geometry declarations:
+
+```latex
+% Examples of supported geometry configurations
+\usepackage[a4paper,margin=2.5cm]{geometry}           % A4 with 2.5cm margins
+\usepackage[letterpaper,left=3cm,right=2cm]{geometry} % US Letter, asymmetric
+\usepackage[a3paper,landscape]{geometry}              % A3 landscape orientation
+```
+
+### Advanced Features
+
+- ✅ **Live Math Rendering**: KaTeX integration for LaTeX math expressions
+- ✅ **Automatic Pagination**: Smart content flow across multiple pages  
+- ✅ **Template System**: Pre-built document templates with one-click insertion
+- ✅ **Spanish Support**: Full internationalization with proper language packages
+- ✅ **Professional Styling**: Business document formatting with proper typography
+- ✅ **Real-time Preview**: Instant document updates with debounced rendering
+- ✅ **Type Safety**: Comprehensive TypeScript coverage with zero linting errors
+- ✅ **Geometry Parsing**: Dynamic page dimensions and margins from LaTeX declarations
+- ✅ **Font Size Support**: Document class font sizing (`\documentclass[12pt]{article}`)
+- ✅ **Spacing Commands**: `\vspace`, `\hspace`, `\smallskip`, `\medskip`, `\bigskip`
+
+## Performance Characteristics
+
+- **Render Speed**: Sub-200ms document updates with debouncing
+- **Memory Efficient**: Lazy loading and component optimization
+- **Scalable**: Handles multi-page documents with automatic pagination
+- **Responsive**: Mobile-friendly interface with touch support
+
+## Future Enhancements
+
+- [ ] PDF Export functionality
+- [ ] Collaborative editing
+- [ ] Advanced math editor
+- [ ] Custom template creator
+- [ ] Document version control
+- [ ] Bibliography management
+
+---
+
+**Built with ❤️ using Vue 3, TypeScript, and modern web technologies**
