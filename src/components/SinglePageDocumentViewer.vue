@@ -23,7 +23,7 @@ const currentGeometry = ref<ParsedGeometry>({
   margins: DEFAULT_PAGE_MARGINS,
   fontSize: 14,
   documentClass: 'article',
-  paragraphSettings: { parindent: 20, parskip: 0 }
+  paragraphSettings: { parindent: 20, parskip: 0, lineSpread: 1.0 }
 });
 
 const fontSize = computed(() => currentGeometry.value.fontSize * props.scale);

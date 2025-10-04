@@ -1,3 +1,5 @@
+import { convertLatexUnit } from "../utils/latex-units";
+
 // Page dimensions in pixels (at 96 DPI for web display)
 export interface PageDimensions {
   name: string;
@@ -9,8 +11,8 @@ export interface PageDimensions {
 export const PAGE_DIMENSIONS: Record<string, PageDimensions> = {
   A4: {
     name: 'A4',
-    width: 794,  // 210mm at 96 DPI
-    height: 1123, // 297mm at 96 DPI
+    width: convertLatexUnit('215.9mm'),  // 210mm at 96 DPI
+    height: convertLatexUnit('279.4mm'), // 297mm at 96 DPI
     aspectRatio: 210 / 297
   },
   A3: {

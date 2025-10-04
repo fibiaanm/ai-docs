@@ -1,4 +1,4 @@
-import { ref, type Ref } from "vue";
+import { computed, ref, type Ref } from "vue";
 import type { ParsedGeometry } from "../../utils/geometry-parser";
 import { useLatexProcessor } from "./useLatexProcessor";
 // @ts-ignore
@@ -14,101 +14,108 @@ export const useCreateLatexStream = (
   } = useLatexProcessor(geometry, overrides);
 
   const documentHasBegun = ref(false);
-  const accumulatedContent = ref('');
+  const accumulatedContent = ref<string>('');
+  const currentLine = ref('');
+  const htmlBatches = ref<string[]>([]);
+  const i = ref(0);
 
+  const isDocumentBeginning = computed(() => currentLine.value.includes('\\begin{document}'));
+  const isDocumentEnd = computed(() => currentLine.value.includes('\\end{document}'));
+
+  const processDocumentBeginning = () => {
+    if (accumulatedContent.value.trim()) {
+      processBeforeDocumentInitialization(accumulatedContent.value.trim());
+      accumulatedContent.value = '';
+    }
+    documentHasBegun.value = true;
+  };
+
+  const processContent = () => {
+    if (accumulatedContent.value.trim()) {
+      const htmlContent = processLatexToHtml(accumulatedContent.value.trim());
+      if (htmlContent.trim()) {
+        htmlBatches.value.push(htmlContent);
+      }
+    }
+  };
+
+  const processDocumentEnd = () => {
+    processContent();
+  };
+
+  const isCurrentLineEmpty = computed(() => currentLine.value.trim() === '');
+
+  const countEmptyLines = (lines: string[]) => {
+    let emptyLineCount = 0;
+    let j = i.value;
+    while (j < lines.length && (lines[j]?.trim() || '') === '') {
+      emptyLineCount++;
+      j++;
+    }
+    return { emptyLineCount, j };
+  }
 
   const createStream = (content: string, targetElement: HTMLDivElement) => {
-    // Reset state for each new stream
-    let documentHasBegun = false;
-    let accumulatedContent = '';
-    const processedBatchesHtml: string[] = [];
-    
     // Split content into lines
     const lines = content.split('\n');
-    let i = 0;
+    i.value = 0;
+    documentHasBegun.value = false;
+    accumulatedContent.value = '';
+    htmlBatches.value = [];
     
-    while (i < lines.length) {
-      const currentLine = lines[i]?.trim() || '';
+    while (i.value < lines.length) {
+      currentLine.value = lines[i.value]?.trim() || '';
       
       // Handle document beginning
-      if (currentLine.includes('\\begin{document}')) {
-        // Process any accumulated preamble content
-        if (accumulatedContent.trim()) {
-          processBeforeDocumentInitialization(accumulatedContent.trim());
-          accumulatedContent = '';
-        }
-        documentHasBegun = true;
-        i++;
+      if (isDocumentBeginning.value) {
+        processDocumentBeginning();
+        i.value++;
         continue;
       }
 
-      if (!documentHasBegun) {
-        accumulatedContent += '\n' + currentLine;
-        i++;
+      if (!documentHasBegun.value) {
+        accumulatedContent.value += '\n' + currentLine.value;
+        i.value++;
         continue;
       }
       
       // Handle document end
-      if (currentLine.includes('\\end{document}')) {
+      if (isDocumentEnd.value) {
         // Process any remaining accumulated content
-        if (accumulatedContent.trim()) {
-          const htmlContent = processLatexToHtml(accumulatedContent.trim());
-          if (htmlContent.trim()) {
-            processedBatchesHtml.push(htmlContent);
-          }
-        }
+        processDocumentEnd();
         break;
       }
       
       // If it's an empty line, we need to check for batching logic
-      if (currentLine === '') {
-        // Count consecutive empty lines
-        let emptyLineCount = 0;
-        let j = i;
-        while (j < lines.length && (lines[j]?.trim() || '') === '') {
-          emptyLineCount++;
-          j++;
-        }
-        
-        // If we have accumulated content and hit empty lines, process the batch
-        if (accumulatedContent.trim()) {
-          if (documentHasBegun) {
-            const htmlContent = processLatexToHtml(accumulatedContent.trim());
-            if (htmlContent.trim()) {
-              processedBatchesHtml.push(htmlContent);
-            }
-          }
-          accumulatedContent = '';
-        }
-        
+      if (isCurrentLineEmpty.value) {
+        const { j } = countEmptyLines(lines);
+
+        if (documentHasBegun.value && accumulatedContent.value.trim()) {
+          processContent();
+          accumulatedContent.value = '';
+        } 
         // Skip all the empty lines
-        i = j;
+        i.value = j;
         continue;
       }
       
       // Add non-empty line to accumulated content
-      if (accumulatedContent) {
-        accumulatedContent += '\n' + currentLine;
+      if (accumulatedContent.value) {
+        accumulatedContent.value += '\n' + currentLine.value;
       } else {
-        accumulatedContent = currentLine;
+        accumulatedContent.value = currentLine.value;
       }
       
-      i++;
+      i.value++;
     }
     
     // Process any remaining content
-    if (accumulatedContent.trim()) {
-      console.log('accumulatedContent', accumulatedContent);
-      if (documentHasBegun) {
-        const htmlContent = processLatexToHtml(accumulatedContent.trim());
-        if (htmlContent.trim()) {
-          processedBatchesHtml.push(htmlContent);
-        }
-      }
+    if (documentHasBegun.value) {
+      processContent();
     }
     
     // Set the final HTML content and render math
-    targetElement.innerHTML = processedBatchesHtml.join('\n');
+    targetElement.innerHTML = htmlBatches.value.join('\n');
     renderMathInElement(targetElement, {
       delimiters: [
         { left: '$$', right: '$$', display: true },

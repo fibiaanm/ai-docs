@@ -8,7 +8,6 @@ import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language'
 import { latex } from 'codemirror-lang-latex';
 import { useLatexDocument } from '../composables/document/useLatexDocument';
 import SinglePageDocumentViewer from './SinglePageDocumentViewer.vue';
-import { processGeometry } from '../utils/geometry-parser';
 
 const editorParent = ref<HTMLDivElement|null>(null);
 const documentContent = ref<string>('');
@@ -18,59 +17,55 @@ const latexDoc = useLatexDocument();
 
 
 // Spanish economic proposal document
-const initialTex = String.raw`\documentclass[15pt]{article}
+const initialTex = String.raw`\documentclass[12pt]{article}
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[a4paper,margin=1.5cm]{geometry}
+\usepackage[a4paper,margin=1in]{geometry}
 \usepackage{xcolor}
 \usepackage{setspace}
-\setlength{\parindent}{0pt}
+\linespread{2}
+\setlength{\parindent}{1.27cm}
 \setlength{\parskip}{6pt}
 
 \begin{document}
 
-\begin{center}
-{\fontsize{25}{18}\selectfont \textbf{PROPUESTA ECONÓMICA}}
-\end{center}
+% --- APA-style title page ---
+\begin{titlepage}
+    \centering
+    \vspace*{3cm}
+    
+    {\Large\textbf{The Positive Impact of Artificial Intelligence on Automated Coding:\\Understanding the Learning Curve}\par}
+    \vspace{2cm}
+    
+    {\large Fabián Mejía\par}
+    \vspace{1cm}
+    
+    {\large Freepik University\par}
+    \vspace{1cm}
+    
+    {\large Department of Computer Science\par}
+    \vspace{1cm}
+    
+    {\large October 2025\par}
+    \vfill
+    
+    {\large Author Note\par}
+    {\small
+    This paper was prepared for [Course Name], instructed by [Instructor’s Name].\\
+    Correspondence concerning this paper should be addressed to\\
+    Fabián Mejía, email: fabianmejia@freepik.com
+    }
+\end{titlepage}
 
-Bucaramanga 23 de mayo de 2025
+\end{document}
 
-Señores\\
-\textbf{UNIVERSIDAD SANTO TOMÁS}\\
-Bucaramanga\\
-NIT 860.012.357-6
-
-
-\textbf{Asunto:} Ensamble de estructura y elementos electrónicos de cancha robótica para el proyecto de investigación titulado "Fortaleciendo Red para promover la convivencia escolar - Fase 2"
-
-Por medio de la presente, me permito presentar la propuesta ensamble de estructura y elementos electrónicos de cancha robótica, con el objetivo de fomentar el aprendizaje práctico en tecnología y robótica.
-
-\[
-E = mc^2
-\]
-
-El servicio incluye el ensamble de estructura de la cancha, sensores para detectar goles automáticamente, cámaras para grabar los partidos y una plataforma web local para organizar campeonatos, registrar resultados y mostrar el marcador en tiempo real. El sistema será autónomo, sin necesidad de internet, y funcionará con componentes electrónicos y software personalizado.
 
 \[
 \int_{0}^{\infty} e^{-x^2} \, dx = \frac{\sqrt{\pi}}{2}, 
 \quad 
 \sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
 \]
-
-Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
-
-Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
-
-Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
-
-Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
-
-Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes. Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes. Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes. Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
-
-
-\textbf{Tiempo de ejecución:} 1 mes\\
-\textbf{Costo del servicio:} $ 2.000.000 (Pago del (100%) al finalizar el servicio)
 
 \end{document}
 `;

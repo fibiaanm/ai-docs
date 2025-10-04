@@ -20,6 +20,8 @@
     "@vueuse/core": "^13.9.0",
     "codemirror-lang-latex": "^0.2.0",
     "katex": "^0.16.22",
+    "latex.js": "^0.12.6",
+    "latex2js": "^3.1.4",
     "tailwindcss": "^4.1.14",
     "vue": "^3.5.21"
   },

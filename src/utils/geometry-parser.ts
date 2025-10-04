@@ -23,6 +23,7 @@ export interface DocumentClassSettings {
 export interface ParagraphSettings {
   parindent: number; // in pixels
   parskip: number;   // in pixels
+  lineSpread: number; // line spacing multiplier (1.0 = normal, 2.0 = double spacing)
 }
 
 export interface ParsedGeometry {
@@ -106,7 +107,8 @@ export function parseDocumentClass(content: string): DocumentClassSettings | nul
 export function parseParagraphSettings(content: string): ParagraphSettings {
   const defaultSettings: ParagraphSettings = {
     parindent: 20, // Default paragraph indentation (about 1.5em at 14px)
-    parskip: 0     // Default no extra space between paragraphs
+    parskip: 0,    // Default no extra space between paragraphs
+    lineSpread: 1.0 // Default normal line spacing
   };
 
   // Extract parindent setting
@@ -119,6 +121,15 @@ export function parseParagraphSettings(content: string): ParagraphSettings {
   const parskipMatch = content.match(/\\setlength\{\\parskip\}\{([^}]+)\}/);
   if (parskipMatch && parskipMatch[1]) {
     defaultSettings.parskip = convertLatexUnit(parskipMatch[1]);
+  }
+
+  // Extract linespread setting
+  const linespreadMatch = content.match(/\\linespread\{([^}]+)\}/);
+  if (linespreadMatch && linespreadMatch[1]) {
+    const value = parseFloat(linespreadMatch[1]);
+    if (!isNaN(value)) {
+      defaultSettings.lineSpread = value;
+    }
   }
 
   return defaultSettings;
@@ -147,7 +158,8 @@ export function processGeometry(content: string): ParsedGeometry {
     documentClass: 'article',
     paragraphSettings: {
       parindent: 20, // Default paragraph indentation
-      parskip: 0     // Default no extra space between paragraphs
+      parskip: 0,    // Default no extra space between paragraphs
+      lineSpread: 1.0 // Default normal line spacing
     }
   };
 
@@ -171,7 +183,8 @@ export function processGeometry(content: string): ParsedGeometry {
   if (paragraphSettings) {
     finalConfig.paragraphSettings = {
       parindent: paragraphSettings.parindent,
-      parskip: paragraphSettings.parskip
+      parskip: paragraphSettings.parskip,
+      lineSpread: paragraphSettings.lineSpread
     };
   }
 
