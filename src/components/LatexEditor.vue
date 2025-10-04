@@ -7,7 +7,7 @@ import { defaultKeymap, indentWithTab } from '@codemirror/commands';
 import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 import { latex } from 'codemirror-lang-latex';
 import { useLatexDocument } from '../composables/document/useLatexDocument';
-import DocumentViewer from './DocumentViewer.vue';
+import SinglePageDocumentViewer from './SinglePageDocumentViewer.vue';
 import { processGeometry } from '../utils/geometry-parser';
 
 const editorParent = ref<HTMLDivElement|null>(null);
@@ -18,11 +18,11 @@ const latexDoc = useLatexDocument();
 
 
 // Spanish economic proposal document
-const initialTex = String.raw`\documentclass[25pt]{article}
+const initialTex = String.raw`\documentclass[15pt]{article}
 \usepackage[spanish]{babel}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
-\usepackage[a4paper,margin=2.5cm]{geometry}
+\usepackage[a4paper,margin=1.5cm]{geometry}
 \usepackage{xcolor}
 \usepackage{setspace}
 \setlength{\parindent}{0pt}
@@ -46,7 +46,17 @@ NIT 860.012.357-6
 
 Por medio de la presente, me permito presentar la propuesta ensamble de estructura y elementos electrónicos de cancha robótica, con el objetivo de fomentar el aprendizaje práctico en tecnología y robótica.
 
+\[
+E = mc^2
+\]
+
 El servicio incluye el ensamble de estructura de la cancha, sensores para detectar goles automáticamente, cámaras para grabar los partidos y una plataforma web local para organizar campeonatos, registrar resultados y mostrar el marcador en tiempo real. El sistema será autónomo, sin necesidad de internet, y funcionará con componentes electrónicos y software personalizado.
+
+\[
+\int_{0}^{\infty} e^{-x^2} \, dx = \frac{\sqrt{\pi}}{2}, 
+\quad 
+\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6}
+\]
 
 Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
 
@@ -82,7 +92,7 @@ function updateDocumentContent() {
   documentContent.value = tex;
 }
 
-// Handle page count changes from DocumentViewer
+// Handle page count changes from SinglePageDocumentViewer
 function handlePageCountChanged(count: number) {
   pageCount.value = count;
 }
@@ -199,11 +209,10 @@ onBeforeUnmount(() => {
       
       <!-- Document viewer -->
       <div class="flex-1 overflow-hidden border rounded-b-2xl h-[calc(100vh-140px)]">
-        <DocumentViewer
+        <SinglePageDocumentViewer
           :content="documentContent"
           :page-dimensions="getCurrentPageDimensions()"
           :scale="0.7"
-          @page-count-changed="handlePageCountChanged"
         />
       </div>
     </div>

@@ -2,7 +2,6 @@ import { EditorView, lineNumbers, highlightActiveLineGutter, keymap, highlightAc
 import { EditorState } from '@codemirror/state';
 import { history, historyKeymap } from '@codemirror/commands';
 import { defaultKeymap, indentWithTab } from '@codemirror/commands';
-import { syntaxHighlighting, defaultHighlightStyle } from '@codemirror/language';
 import { latex } from 'codemirror-lang-latex';
 
 export const createLatexEditor = (element: HTMLDivElement, onDocumentChange: () => void) => {

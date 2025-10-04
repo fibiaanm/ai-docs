@@ -31,8 +31,7 @@ A modern, web-based LaTeX document editor built with Vue 3, TypeScript, and Code
 ```typescript
 // Main editor component structure
 ├── LatexEditor.vue          // Split-pane editor interface
-├── DocumentViewer.vue       // Multi-page document renderer  
-├── DocumentPage.vue         // Individual page component
+├── SinglePageDocumentViewer.vue  // Auto-height document renderer  
 └── TopBar.vue              // Template selector and tools
 ```
 
@@ -49,20 +48,19 @@ A modern, web-based LaTeX document editor built with Vue 3, TypeScript, and Code
 ::mermaid
 graph LR
     A[LaTeX Source] --> B[Content Parser]
-    B --> C[Pagination Engine]
-    C --> D[HTML Generator]
-    D --> E[KaTeX Renderer]
-    E --> F[A4 Page Layout]
+    B --> C[HTML Generator]
+    C --> D[KaTeX Renderer]
+    D --> E[Auto-Height Layout]
 ::
 
-### Intelligent Pagination
+### Auto-Height Document Rendering
 
-The editor features a sophisticated pagination system that:
+The editor features a streamlined single-page rendering system that:
 
-- **Analyzes Content Structure**: Identifies headings, paragraphs, math expressions, and lists
-- **Estimates Content Heights**: Calculates space requirements for different elements
-- **Smart Page Breaks**: Avoids breaking important content across pages
-- **Content Splitting**: Intelligently divides long paragraphs and lists
+- **Direct LaTeX Processing**: Converts LaTeX to HTML without pagination
+- **Auto-Height Layout**: Content flows naturally without page constraints  
+- **Visual Page Breaks**: Converts `\newpage` commands to horizontal divider lines
+- **Maintains Width**: Preserves document width while allowing unlimited height
 
 ## Example Usage
 
@@ -129,8 +127,7 @@ npm run build
 src/
 ├── components/
 │   ├── LatexEditor.vue      # Main editor interface
-│   ├── DocumentViewer.vue   # Document preview system
-│   ├── DocumentPage.vue     # Individual page renderer
+│   ├── SinglePageDocumentViewer.vue # Auto-height document renderer
 │   └── TopBar.vue          # Template selector
 ├── composables/
 │   └── document/           # Document management logic
@@ -138,7 +135,6 @@ src/
 │   ├── page-dimensions.ts  # A4/Letter page specifications
 │   └── latex-templates.ts  # Document templates
 ├── utils/
-│   ├── pagination.ts       # Smart pagination engine
 │   ├── lipsum.ts          # Lorem ipsum generator
 │   ├── latex-units.ts     # LaTeX to CSS unit conversion
 │   └── geometry-parser.ts # Geometry package parsing
@@ -229,7 +225,7 @@ Dynamic page layout based on LaTeX geometry declarations:
 
 - **Render Speed**: Sub-200ms document updates with debouncing
 - **Memory Efficient**: Lazy loading and component optimization
-- **Scalable**: Handles multi-page documents with automatic pagination
+- **Scalable**: Handles documents of any length with auto-height rendering
 - **Responsive**: Mobile-friendly interface with touch support
 
 ## Future Enhancements

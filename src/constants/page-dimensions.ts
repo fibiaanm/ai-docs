@@ -39,7 +39,7 @@ export const PAGE_DIMENSIONS: Record<string, PageDimensions> = {
   }
 };
 
-export const DEFAULT_PAGE_DIMENSIONS = PAGE_DIMENSIONS.A4;
+export const DEFAULT_PAGE_DIMENSIONS = PAGE_DIMENSIONS.A4!;
 
 // Page margins in pixels
 export interface PageMargins {
