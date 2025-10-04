@@ -34,18 +34,13 @@ const initialTex = String.raw`\documentclass[25pt]{article}
 {\fontsize{25}{18}\selectfont \textbf{PROPUESTA ECONÓMICA}}
 \end{center}
 
-\vspace{14pt}
-
 Bucaramanga 23 de mayo de 2025
-
-\vspace{10pt}
 
 Señores\\
 \textbf{UNIVERSIDAD SANTO TOMÁS}\\
 Bucaramanga\\
 NIT 860.012.357-6
 
-\vspace{10pt}
 
 \textbf{Asunto:} Ensamble de estructura y elementos electrónicos de cancha robótica para el proyecto de investigación titulado "Fortaleciendo Red para promover la convivencia escolar - Fase 2"
 
@@ -57,10 +52,12 @@ Esta propuesta económica busca ofrecer una experiencia innovadora que combine e
 
 Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
 
-  Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
-  Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes. Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
+Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
 
-\vspace{6pt}
+Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
+
+Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes. Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes. Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes. Esta propuesta económica busca ofrecer una experiencia innovadora que combine entretenimiento, educación y tecnología, ideal para espacios académicos o actividades de formación, de acuerdo con el diseño e indicaciones de los clientes.
+
 
 \textbf{Tiempo de ejecución:} 1 mes\\
 \textbf{Costo del servicio:} $ 2.000.000 (Pago del (100%) al finalizar el servicio)
