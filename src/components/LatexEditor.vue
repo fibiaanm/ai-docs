@@ -92,19 +92,6 @@ function updateDocumentContent() {
   documentContent.value = tex;
 }
 
-// Handle page count changes from SinglePageDocumentViewer
-function handlePageCountChanged(count: number) {
-  pageCount.value = count;
-}
-
-// Get dynamic page dimensions based on geometry package
-const getCurrentPageDimensions = () => {
-  const tex = getDoc();
-  const geometry = processGeometry(tex);
-  return geometry.dimensions;
-};
-
-
 onMounted(() => {
   if (!editorParent.value) return;
 
@@ -211,7 +198,6 @@ onBeforeUnmount(() => {
       <div class="flex-1 overflow-hidden border rounded-b-2xl h-[calc(100vh-140px)]">
         <SinglePageDocumentViewer
           :content="documentContent"
-          :page-dimensions="getCurrentPageDimensions()"
           :scale="0.7"
         />
       </div>

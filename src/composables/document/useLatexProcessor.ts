@@ -1,45 +1,32 @@
-import { processLipsumCommands } from '../../utils/lipsum';
+
 import { convertLatexUnit } from '../../utils/latex-units';
 import { processGeometry, type ParsedGeometry } from '../../utils/geometry-parser';
 // @ts-ignore
 import renderMathInElement from 'katex/dist/contrib/auto-render.mjs';
-import type { Ref } from 'vue';
-
-
+import type { Ref } from 'vue';    
 
 export const useLatexProcessor = (
-    geometry: Ref<ParsedGeometry>,
-    overrides: any[]
+    _geometry: Ref<ParsedGeometry>,
+    _overrides: any[]
 ) => {
 
     const processBeforeDocumentInitialization = (content: string) => {
+        const geometry = processGeometry(content);
+        _geometry.value = geometry;
+        return content
+            .replace(/\\documentclass(\[[^\]]*\])?\{[^}]*\}/g, '') // Remove documentclass declarations
+            .replace(/\\usepackage(\[[^\]]*\])?\{(?!geometry)[^}]*\}/g, '') // Preserve geometry package
+            .replace(/\\setlength\{\\parindent\}\{[^}]*\}/g, '') // Remove parindent setlength commands
+            .replace(/\\setlength\{\\parskip\}\{[^}]*\}/g, '') // Remove parskip setlength commands
+            .replace(/\\begin\{document\}/g, '')
+            .replace(/\\end\{document\}/g, '')
+            .replace(/\\maketitle/g, '');
+    }
+    
+    const processLatexToHtml = (content: string): string => {
+        let processedContent = content;
         
-    }
-
-  const processLatexToHtml = (content: string): string => {
-    let processedContent = content;
-    
-    // Get font size and paragraph settings from document class for dynamic styling
-    const geometryConfig = processGeometry(content);
-    const { parindent, parskip } = geometryConfig.paragraphSettings;
-    geometry.value = geometryConfig;
-
-    for (const override of overrides) {
-      processedContent = override(processedContent);
-    }
-    
-    // Process lipsum commands first
-    processedContent = processLipsumCommands(processedContent);
-    
-    // Remove document structure that doesn't belong in page content (but preserve geometry for processing)
-    processedContent = processedContent
-      .replace(/\\documentclass(\[[^\]]*\])?\{[^}]*\}/g, '') // Remove documentclass declarations
-      .replace(/\\usepackage(\[[^\]]*\])?\{(?!geometry)[^}]*\}/g, '') // Preserve geometry package
-      .replace(/\\setlength\{\\parindent\}\{[^}]*\}/g, '') // Remove parindent setlength commands
-      .replace(/\\setlength\{\\parskip\}\{[^}]*\}/g, '') // Remove parskip setlength commands
-      .replace(/\\begin\{document\}/g, '')
-      .replace(/\\end\{document\}/g, '')
-      .replace(/\\maketitle/g, '');
+        const { parindent, parskip } = _geometry.value.paragraphSettings;
 
     // Convert LaTeX commands to HTML
     processedContent = processedContent
@@ -82,19 +69,11 @@ export const useLatexProcessor = (
       
       // Handle line breaks and paragraphs
       .replace(/\\\\/g, '<br>')
-      .replace(/\n\s*\n/g, '</p><p class="mb-4">');
+      .replace(/\n\s*\n/g, '</p><p>');
 
-    // Wrap content in paragraphs if not already wrapped, with dynamic font size and paragraph styling
+    // Wrap content in paragraphs if not already wrapped
     if (processedContent.trim() && !processedContent.trim().startsWith('<')) {
-      const paragraphStyle = `text-indent: ${parindent}px;`;
-      const containerStyle = ``;
-      processedContent = `<div style="${containerStyle}"><p class="mb-4" style="${paragraphStyle}">${processedContent}</p></div>`;
-    } else if (parindent !== 20 || parskip !== 0) {
-      // Apply font size and paragraph styling to existing content
-      const containerStyle = ``;
-      // Add paragraph spacing by modifying paragraph margins
-      const paragraphSpacingStyle = parskip > 0 ? `<style>.mb-4 { margin-bottom: ${parskip + 16}px !important; } p { text-indent: ${parindent}px; }</style>` : `<style>p { text-indent: ${parindent}px; }</style>`;
-      processedContent = `${paragraphSpacingStyle}<div style="${containerStyle}">${processedContent}</div>`;
+      processedContent = `<p style="text-indent: ${parindent}px; margin-bottom: ${parskip}px;">${processedContent}</p>`;
     }
 
     return processedContent;
@@ -122,6 +101,7 @@ export const useLatexProcessor = (
 
   return {
     processLatexToHtml,
-    renderContent
+    renderContent,
+    processBeforeDocumentInitialization
   };
 };

@@ -1,14 +1,11 @@
 <script setup lang="ts">
 import { watch, ref, onMounted, computed } from 'vue';
-import type { PageDimensions, PageMargins } from '../constants/page-dimensions';
 import { DEFAULT_PAGE_DIMENSIONS, DEFAULT_PAGE_MARGINS } from '../constants/page-dimensions';
 import { type ParsedGeometry } from '../utils/geometry-parser';
-import { useLatexProcessor } from '../composables/document/useLatexProcessor';
+import { useCreateLatexStream } from '../composables/document/useCreateLatexStream';
 
 interface Props {
   content: string;
-  pageDimensions?: PageDimensions;
-  pageMargins?: PageMargins;
   scale?: number;
   showPageNumbers?: boolean;
 }
@@ -30,6 +27,9 @@ const currentGeometry = ref<ParsedGeometry>({
 });
 
 const fontSize = computed(() => currentGeometry.value.fontSize * props.scale);
+const lineHeight = computed(() => 1.6 * props.scale);
+const paragraphSpacing = computed(() => currentGeometry.value.paragraphSettings.parskip * props.scale);
+const paragraphSize = computed(() => currentGeometry.value.paragraphSettings.parindent * props.scale);
 
 // Calculate scaled dimensions
 const scaledWidth = () => currentGeometry.value.dimensions.width * props.scale;
@@ -40,8 +40,7 @@ const scaledMargins = () => ({
   left: currentGeometry.value.margins.left * props.scale,
 });
 
-// Use the LaTeX processor composable
-const { renderContent } = useLatexProcessor(
+const { createStream } = useCreateLatexStream(
     currentGeometry,
     [
         (content: string) => {
@@ -53,7 +52,7 @@ const { renderContent } = useLatexProcessor(
 // Render content function
 const renderLatexContent = () => {
   if (!contentElement.value) return;
-  renderContent(contentElement.value, props.content);
+  createStream(props.content, contentElement.value);
 };
 
 // Watch for content changes
@@ -88,8 +87,8 @@ onMounted(() => {
             marginRight: `${scaledMargins().right}px`,
             marginTop: `${scaledMargins().top}px`,
             marginBottom: `${scaledMargins().bottom}px`,
-            fontSize: `${currentGeometry.fontSize * props.scale}px`,
-            lineHeight: `${1.6 * props.scale}`
+            fontSize: `${fontSize}px`,
+            lineHeight: `${lineHeight}`
           }"
         ></div>
       </div>

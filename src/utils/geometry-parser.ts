@@ -35,6 +35,7 @@ export interface ParsedGeometry {
 
 /**
  * Parse geometry package options from LaTeX content
+ * Enhanced to handle various syntax patterns
  */
 export function parseGeometryPackage(content: string): GeometrySettings | null {
   const geometryMatch = content.match(/\\usepackage\[([^\]]*)\]\{geometry\}/);
@@ -55,13 +56,15 @@ export function parseGeometryPackage(content: string): GeometrySettings | null {
   // Parse orientation
   if (options.includes('landscape')) settings.landscape = true;
 
-  // Parse margin options
-  const marginPattern = /(\w+)=([^,\]]+)/g;
+  // Enhanced margin parsing to handle various syntax patterns
+  // Matches: margin=1.5cm, top=2cm, left=1in, etc.
+  const marginPattern = /(\w+)\s*=\s*([^\s,\]]+)/g;
   let match;
   while ((match = marginPattern.exec(options)) !== null) {
     if (match[1] && match[2]) {
-      const key = match[1];
+      const key = match[1].trim();
       const value = match[2].trim();
+      
       if (key === 'margin') {
         settings.margins.margin = value;
       } else if (['top', 'bottom', 'left', 'right'].includes(key)) {
@@ -122,96 +125,106 @@ export function parseParagraphSettings(content: string): ParagraphSettings {
 }
 
 /**
- * Convert geometry settings to page dimensions and margins
- */
-export function applyGeometrySettings(settings: GeometrySettings | null, documentClass?: DocumentClassSettings | null, paragraphSettings?: ParagraphSettings | null): ParsedGeometry {
-  // Default to A4 if no settings
-  let dimensions: PageDimensions = {
-    name: 'A4',
-    width: 794,
-    height: 1123,
-    aspectRatio: 210 / 297
-  };
-  let margins: PageMargins = {
-    top: 96,    // 1 inch default
-    bottom: 96,
-    left: 96,
-    right: 96
-  };
-  
-  // Default font size (14px), document class, and paragraph settings
-  let fontSize = 14;
-  let docClass = 'article';
-  let paragraphConfig: ParagraphSettings = {
-    parindent: 20, // Default indentation
-    parskip: 0     // Default no extra spacing
-  };
-
-  // Apply document class settings
-  if (documentClass) {
-    docClass = documentClass.class;
-    if (documentClass.fontSize) {
-      fontSize = convertLatexUnit(documentClass.fontSize); // Use existing utility!
-    }
-  }
-
-  // Apply paragraph settings
-  if (paragraphSettings) {
-    paragraphConfig = paragraphSettings;
-  }
-
-  if (!settings) return { dimensions, margins, fontSize, documentClass: docClass, paragraphSettings: paragraphConfig };
-
-  // Apply paper size
-  if (settings.paperSize && PAGE_DIMENSIONS[settings.paperSize]) {
-    const baseDimensions = PAGE_DIMENSIONS[settings.paperSize];
-    if (baseDimensions) {
-      dimensions = { 
-        name: baseDimensions.name,
-        width: baseDimensions.width,
-        height: baseDimensions.height,
-        aspectRatio: baseDimensions.aspectRatio
-      };
-    }
-  }
-
-  // Apply landscape orientation (swap width/height)
-  if (settings.landscape) {
-    dimensions = {
-      name: dimensions.name,
-      width: dimensions.height,
-      height: dimensions.width,
-      aspectRatio: 1 / dimensions.aspectRatio
-    };
-  }
-
-  // Apply margins
-  if (settings.margins.margin) {
-    // Uniform margin
-    const marginPx = convertLatexUnit(settings.margins.margin);
-    margins = {
-      top: marginPx,
-      bottom: marginPx,
-      left: marginPx,
-      right: marginPx
-    };
-  }
-
-  // Apply individual margins (override uniform if specified)
-  if (settings.margins.top) margins.top = convertLatexUnit(settings.margins.top);
-  if (settings.margins.bottom) margins.bottom = convertLatexUnit(settings.margins.bottom);
-  if (settings.margins.left) margins.left = convertLatexUnit(settings.margins.left);
-  if (settings.margins.right) margins.right = convertLatexUnit(settings.margins.right);
-
-  return { dimensions, margins, fontSize, documentClass: docClass, paragraphSettings: paragraphConfig };
-}
-
-/**
  * Extract geometry settings from LaTeX content and return parsed configuration
+ * Following the proper pattern: load defaults first, parse all packages, then override
  */
 export function processGeometry(content: string): ParsedGeometry {
+  // 1. START WITH COMPLETE DEFAULTS
+  const defaultConfig: ParsedGeometry = {
+    dimensions: {
+      name: 'A4',
+      width: 794,
+      height: 1123,
+      aspectRatio: 210 / 297
+    },
+    margins: {
+      top: 96,    // 1 inch default
+      bottom: 96,
+      left: 96,
+      right: 96
+    },
+    fontSize: 14,
+    documentClass: 'article',
+    paragraphSettings: {
+      parindent: 20, // Default paragraph indentation
+      parskip: 0     // Default no extra space between paragraphs
+    }
+  };
+
+  // 2. PARSE ALL LaTeX PACKAGES AND COMMANDS
   const geometrySettings = parseGeometryPackage(content);
   const documentClassSettings = parseDocumentClass(content);
   const paragraphSettings = parseParagraphSettings(content);
-  return applyGeometrySettings(geometrySettings, documentClassSettings, paragraphSettings);
+
+  // 3. START WITH DEFAULTS AND OVERRIDE WITH PARSED VALUES
+  let finalConfig = { ...defaultConfig };
+
+  // Override document class settings
+  if (documentClassSettings) {
+    finalConfig.documentClass = documentClassSettings.class;
+    if (documentClassSettings.fontSize) {
+      finalConfig.fontSize = convertLatexUnit(documentClassSettings.fontSize);
+    }
+  }
+
+  // Override paragraph settings
+  if (paragraphSettings) {
+    finalConfig.paragraphSettings = {
+      parindent: paragraphSettings.parindent,
+      parskip: paragraphSettings.parskip
+    };
+  }
+
+  // Override geometry settings
+  if (geometrySettings) {
+    // Apply paper size
+    if (geometrySettings.paperSize && PAGE_DIMENSIONS[geometrySettings.paperSize]) {
+      const baseDimensions = PAGE_DIMENSIONS[geometrySettings.paperSize];
+      if (baseDimensions) {
+        finalConfig.dimensions = {
+          name: baseDimensions.name,
+          width: baseDimensions.width,
+          height: baseDimensions.height,
+          aspectRatio: baseDimensions.aspectRatio
+        };
+      }
+    }
+
+    // Apply landscape orientation (swap width/height)
+    if (geometrySettings.landscape) {
+      finalConfig.dimensions = {
+        name: finalConfig.dimensions.name,
+        width: finalConfig.dimensions.height,
+        height: finalConfig.dimensions.width,
+        aspectRatio: 1 / finalConfig.dimensions.aspectRatio
+      };
+    }
+
+    // Apply margins
+    if (geometrySettings.margins.margin) {
+      // Uniform margin
+      const marginPx = convertLatexUnit(geometrySettings.margins.margin);
+      finalConfig.margins = {
+        top: marginPx,
+        bottom: marginPx,
+        left: marginPx,
+        right: marginPx
+      };
+    }
+
+    // Apply individual margins (override uniform if specified)
+    if (geometrySettings.margins.top) {
+      finalConfig.margins.top = convertLatexUnit(geometrySettings.margins.top);
+    }
+    if (geometrySettings.margins.bottom) {
+      finalConfig.margins.bottom = convertLatexUnit(geometrySettings.margins.bottom);
+    }
+    if (geometrySettings.margins.left) {
+      finalConfig.margins.left = convertLatexUnit(geometrySettings.margins.left);
+    }
+    if (geometrySettings.margins.right) {
+      finalConfig.margins.right = convertLatexUnit(geometrySettings.margins.right);
+    }
+  }
+  return finalConfig;
 }
