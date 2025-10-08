@@ -1,10 +1,13 @@
+export type LatexUnit = 'pt' | 'px' | 'em' | 'cm' | 'mm' | 'in';
+export type LatexUnitValue = `${number}${LatexUnit}`;
+
 /**
  * Convert LaTeX units to CSS pixels
  * 
  * @param value - LaTeX unit value (e.g., "10pt", "2em", "1.5cm")
  * @returns Pixel value as number
  */
-export function convertLatexUnit(value: string): number {
+export function convertLatexUnit(value: LatexUnitValue | string): number {
   const match = value.match(/^([0-9.]+)(.*)$/);
   if (!match || !match[1]) return 0;
   
@@ -21,4 +24,13 @@ export function convertLatexUnit(value: string): number {
     case 'in': return num * 96; // inches to pixels
     default: return num; // fallback to treating as pixels
   }
+}
+
+/**
+ * Check if an option is any of the LaTeX units
+ * @param option 
+ * @returns 
+ */
+export function isOptionLatexUnit(option: string): boolean {
+  return option.match(/(\d+(?:\.\d+)?)pt|px|em|cm|mm|in/) !== null;
 }

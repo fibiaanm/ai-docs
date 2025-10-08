@@ -4,16 +4,23 @@ import { processGeometry, type ParsedGeometry } from '../../utils/geometry-parse
 // @ts-ignore
 import renderMathInElement from 'katex/dist/contrib/auto-render.mjs';
 import type { Ref } from 'vue';
+import { useDocumentConfig } from './useDocumentConfig';
 
 export const useLatexProcessor = (
     _geometry: Ref<ParsedGeometry>,
     _parseOverrides: any[]
 ) => {
 
+    const { processHeaderSettings } = useDocumentConfig();
+
     const processBeforeDocumentInitialization = (content: string) => {
         const geometry = processGeometry(content);
         _geometry.value = geometry;
         console.log('processBeforeDocumentInitialization', geometry, content);
+
+        processHeaderSettings(content);
+
+
         return content
             .replace(/\\documentclass(\[[^\]]*\])?\{[^}]*\}/g, '') // Remove documentclass declarations
             .replace(/\\usepackage(\[[^\]]*\])?\{(?!geometry)[^}]*\}/g, '') // Preserve geometry package
